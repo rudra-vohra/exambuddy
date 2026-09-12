@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, FileText, BarChart3, ShieldCheck, Database } from 'lucide-react';
+import { BookOpen, FileText, BarChart3, ShieldCheck } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, health }) {
   return (
@@ -58,10 +58,6 @@ export default function Navbar({ activeTab, setActiveTab, health }) {
 
         {/* Health Indicators */}
         <div className="hidden md:flex items-center space-x-3 text-xs">
-          <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300">
-            <Database className="w-3.5 h-3.5 text-blue-400" />
-            <span>Qdrant: {health?.qdrant_connected ? 'Connected' : 'Offline'}</span>
-          </div>
           <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>Refusal Guard: Active</span>

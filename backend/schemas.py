@@ -6,9 +6,14 @@ class CitationItem(BaseModel):
     page_number: int = Field(..., description="Exact page or slide number")
     text_snippet: str = Field(default="", description="Relevant excerpt supporting the statement")
 
+class ChatMessage(BaseModel):
+    role: str = Field(..., description="Role: 'user' or 'assistant'")
+    content: str = Field(..., description="Message text content")
+
 class ChatRequest(BaseModel):
     query: str = Field(..., min_length=1, description="Student exam query")
     session_id: Optional[str] = Field(default=None, description="Optional conversation session ID")
+    history: Optional[List[ChatMessage]] = Field(default=None, description="Optional previous conversation messages")
 
 class ChatResponse(BaseModel):
     answer: str = Field(..., description="Strictly grounded response or exact refusal message")

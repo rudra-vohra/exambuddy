@@ -40,6 +40,7 @@ export default function ChatView({
 
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const sessionIdRef = useRef('session-' + Date.now());
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -61,14 +62,27 @@ export default function ChatView({
     setInputQuery('');
     setLoading(true);
 
+    // Prepare conversation history payload for multi-turn conversational reasoning
+    const historyPayload = messages
+      .filter(m => (m.sender === 'user' || m.sender === 'assistant') && m.id !== 'init-1' && !m.refusal)
+      .slice(-6)
+      .map(m => ({
+        role: m.sender === 'user' ? 'user' : 'assistant',
+        content: m.text
+      }));
+
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 40000);
+    const timeoutId = setTimeout(() => controller.abort(), 90000);
 
     try {
       const response = await fetch(`${apiBase}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: q }),
+        body: JSON.stringify({
+          query: q,
+          session_id: sessionIdRef.current,
+          history: historyPayload
+        }),
         signal: controller.signal
       });
 
@@ -78,6 +92,9 @@ export default function ChatView({
       }
 
       const data = await response.json();
+      if (data.session_id) {
+        sessionIdRef.current = data.session_id;
+      }
       setMessages(prev => [
         ...prev,
         {

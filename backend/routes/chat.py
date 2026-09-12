@@ -16,16 +16,37 @@ async def handle_chat(request: ChatRequest):
     if not query:
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
-    # 1. Retrieve relevant contexts across documents off the event loop
-    chunks = await asyncio.to_thread(retriever_service.retrieve, query=query)
+    # 1. Extract conversation history
+    history = []
+    if request.history:
+        for m in request.history:
+            history.append({
+                "role": m.role if hasattr(m, "role") else m.get("role", "user"),
+                "content": m.content if hasattr(m, "content") else m.get("content", "")
+            })
+    elif request.session_id:
+        db_history = await db_service.get_session_history(session_id)
+        for h in db_history:
+            if "query" in h and "answer" in h:
+                history.append({"role": "user", "content": h["query"]})
+                history.append({"role": "assistant", "content": h["answer"]})
+
+    # 2. Reformulate follow-up query with conversational context
+    search_query = query
+    if history:
+        search_query = await asyncio.to_thread(generator_service.reformulate_query, query, history)
+
+    # 3. Retrieve relevant contexts across documents off the event loop
+    chunks = await asyncio.to_thread(retriever_service.retrieve, query=search_query)
     context_str = retriever_service.build_context_string(chunks)
 
-    # 2. Generate grounded answer or refusal off the event loop
+    # 4. Generate grounded answer or refusal off the event loop with conversation context
     result = await asyncio.to_thread(
         generator_service.generate_grounded_answer,
         query=query,
         context_chunks=chunks,
-        context_string=context_str
+        context_string=context_str,
+        chat_history=history
     )
 
     citations = [

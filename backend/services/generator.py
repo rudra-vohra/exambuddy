@@ -1,7 +1,7 @@
 import json
 import re
 import logging
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from openai import OpenAI
 from backend.config import settings
 from backend.schemas import CitationItem, ChatResponse
@@ -53,7 +53,56 @@ class GeneratorService:
             )
         return self._client
 
-    def generate_grounded_answer(self, query: str, context_chunks: List[Dict[str, Any]], context_string: str) -> Dict[str, Any]:
+    def reformulate_query(self, query: str, chat_history: Optional[List[Dict[str, Any]]] = None) -> str:
+        if not chat_history:
+            return query
+
+        recent = [m for m in chat_history if m.get("content") and str(m.get("content")).strip()]
+        if not recent:
+            return query
+
+        dialogue = []
+        for m in recent[-4:]:
+            role = "Student" if m.get("role") == "user" else "Assistant"
+            dialogue.append(f"{role}: {str(m.get('content', '')).strip()[:250]}")
+        dialogue_text = "\n".join(dialogue)
+
+        system_instruction = (
+            "Given the following dialogue history between a Student and an Assistant, "
+            "reformulate the student's latest query into a standalone search query that captures "
+            "the core subject, technology, or topic discussed in the conversation. "
+            "If the latest query is already completely standalone and self-contained, return it unchanged. "
+            "Do NOT answer the question. Only output the standalone query."
+        )
+
+        try:
+            response = self.client.chat.completions.create(
+                model=settings.GENERATION_MODEL,
+                messages=[
+                    {"role": "system", "content": system_instruction},
+                    {
+                        "role": "user",
+                        "content": f"Dialogue History:\n{dialogue_text}\n\nStudent Query: {query}\n\nStandalone Query:"
+                    }
+                ],
+                temperature=0.0,
+                timeout=8.0
+            )
+            reformulated = response.choices[0].message.content.strip()
+            reformulated = re.sub(r'^(Standalone Query|Query|Question):\s*', '', reformulated, flags=re.IGNORECASE)
+            reformulated = reformulated.strip('"\' \n')
+            return reformulated if reformulated else query
+        except Exception as e:
+            logger.warning(f"Query reformulation error: {e}")
+            return query
+
+    def generate_grounded_answer(
+        self,
+        query: str,
+        context_chunks: List[Dict[str, Any]],
+        context_string: str,
+        chat_history: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
         # If no chunks were retrieved at all
         if not context_chunks or not context_string.strip():
             return {
@@ -62,7 +111,18 @@ class GeneratorService:
                 "refusal": True
             }
 
-        user_content = f"""Student Query:
+        history_section = ""
+        if chat_history:
+            recent_turns = []
+            for m in chat_history[-4:]:
+                r = "Student" if m.get("role") == "user" else "Assistant"
+                c = str(m.get("content", "")).strip()[:300]
+                if c:
+                    recent_turns.append(f"{r}: {c}")
+            if recent_turns:
+                history_section = "Previous Conversation:\n" + "\n".join(recent_turns) + "\n\n"
+
+        user_content = f"""{history_section}Student Query:
 {query}
 
 Available Course Material Excerpts:
@@ -79,7 +139,7 @@ Remember: If the answer cannot be determined purely from these excerpts, you mus
                 ],
                 response_format={"type": "json_object"},
                 temperature=0.0,
-                timeout=30.0
+                timeout=60.0
             )
             raw_text = response.choices[0].message.content.strip()
 
