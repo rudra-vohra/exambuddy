@@ -1,0 +1,244 @@
+[
+  {
+    "id": 1,
+    "query": "What is the condition for a linear time-invariant discrete-time system to be stable in terms of its impulse response?",
+    "category": "single_source",
+    "ground_truth_pages": [{"source": "dsp_lecture_notes.pdf", "page": 1}],
+    "expected_answer": "A discrete-time LTI system is bounded-input bounded-output (BIBO) stable if and only if its impulse response h[n] is absolutely summable, i.e., sum_{n=-inf}^{inf} |h[n]| < inf."
+  },
+  {
+    "id": 2,
+    "query": "State the symmetry and periodicity properties of the Discrete-Time Fourier Transform (DTFT).",
+    "category": "single_source",
+    "ground_truth_pages": [{"source": "dsp_lecture_notes.pdf", "page": 4}],
+    "expected_answer": "DTFT is periodic in frequency with period 2*pi (X(omega + 2*pi) = X(omega)). For real-valued sequences, X(e^{j*omega}) has conjugate symmetry: X(e^{-j*omega}) = X^*(e^{j*omega})."
+  },
+  {
+    "id": 3,
+    "query": "What are the ROC properties of the Z-transform for a right-sided sequence?",
+    "category": "single_source",
+    "ground_truth_pages": [{"source": "dsp_lecture_notes.pdf", "page": 5}],
+    "expected_answer": "For a right-sided sequence, the Region of Convergence (ROC) is the exterior of a circle of radius r_max, extending outward to infinity (including z = inf if the sequence is causal)."
+  },
+  {
+    "id": 4,
+    "query": "What is the difference between circular convolution and linear convolution, and how many zero-padded samples are needed to avoid time-aliasing?",
+    "category": "single_source",
+    "ground_truth_pages": [{"source": "dsp_lecture_notes.pdf", "page": 10}],
+    "expected_answer": "Circular convolution convolves two periodic or modulo-N sequences, whereas linear convolution operates on aperiodic sequences. To obtain linear convolution using DFT of length N without time-aliasing, N must be at least L + M - 1, where L and M are the lengths of the sequences."
+  },
+  {
+    "id": 5,
+    "query": "Explain the computational complexity reduction of the Decimation-in-Time (DIT) Radix-2 FFT compared to direct DFT.",
+    "category": "single_source",
+    "ground_truth_pages": [{"source": "dsp_lecture_notes.pdf", "page": 11}],
+    "expected_answer": "Direct computation of an N-point DFT requires N^2 complex multiplications and N(N-1) complex additions. Radix-2 DIT FFT reduces this to (N/2)*log2(N) complex multiplications and N*log2(N) complex additions."
+  },
+  {
+    "id": 6,
+    "query": "What are the characteristics of Hamming and Blackman window functions used in FIR filter design?",
+    "category": "single_source",
+    "ground_truth_pages": [{"source": "dsp_lecture_notes.pdf", "page": 15}],
+    "expected_answer": "Hamming window has a mainlobe width of 8*pi/M and peak sidelobe attenuation of -43 dB. Blackman window provides higher stopband attenuation of -74 dB at the cost of a wider mainlobe width of 12*pi/M."
+  },
+  {
+    "id": 7,
+    "query": "State the Nyquist-Shannon sampling theorem and the definition of folding frequency.",
+    "category": "single_source",
+    "ground_truth_pages": [{"source": "dsp_slides_sampling_quantization.pdf", "page": 2}],
+    "expected_answer": "A continuous-time bandlimited signal with maximum frequency F_max can be uniquely reconstructed from its samples if the sampling rate F_s >= 2 * F_max. The folding frequency is F_s / 2."
+  },
+  {
+    "id": 8,
+    "query": "What is the formula for the variance of uniform quantization noise in terms of step size Delta?",
+    "category": "single_source",
+    "ground_truth_pages": [{"source": "dsp_slides_sampling_quantization.pdf", "page": 9}],
+    "expected_answer": "Assuming quantization error is uniformly distributed between -Delta/2 and Delta/2, the quantization noise variance is sigma_q^2 = Delta^2 / 12."
+  },
+  {
+    "id": 9,
+    "query": "Explain the 6.02*B + 1.76 dB rule of thumb for Signal-to-Quantization-Noise Ratio (SQNR).",
+    "category": "single_source",
+    "ground_truth_pages": [{"source": "dsp_slides_sampling_quantization.pdf", "page": 10}],
+    "expected_answer": "For a full-scale sinusoidal input quantized with B bits, SQNR (dB) = 6.02 * B + 1.76 dB, showing each additional bit of resolution improves SQNR by approximately 6 dB."
+  },
+  {
+    "id": 10,
+    "query": "Describe the Goertzel algorithm and its computational advantage for single DFT bin evaluation.",
+    "category": "single_source",
+    "ground_truth_pages": [{"source": "dsp_algorithms_cheatsheet.md", "page": 4}],
+    "expected_answer": "The Goertzel algorithm evaluates an isolated DFT frequency bin using a second-order recursive IIR filter structure, requiring N+2 real multiplications and 2N+1 real additions, making it much faster than FFT when computing fewer than log2(N) bins."
+  },
+  {
+    "id": 11,
+    "query": "How does the frequency warping in the bilinear transform relate to the continuous frequency in the handwritten derivations and the discrete filter specifications in the lecture notes?",
+    "category": "multi_source",
+    "ground_truth_pages": [
+      {"source": "dsp_lecture_notes.pdf", "page": 21},
+      {"source": "handwritten_bilinear_transform.pdf", "page": 2}
+    ],
+    "expected_answer": "Bilinear transformation non-linearly maps the infinite analog frequency axis (-inf to +inf) onto the digital unit circle (-pi to +pi) via Omega = (2/T)*tan(omega/2). This compression causes frequency warping, requiring continuous cutoff frequencies to be prewarped before designing the analog prototype."
+  },
+  {
+    "id": 12,
+    "query": "Synthesize how the sampling frequency F_s from the lecture slides affects the prewarping formula Omega_c = 2*Fs*tan(omega_c/2) in the handwritten Butterworth filter design.",
+    "category": "multi_source",
+    "ground_truth_pages": [
+      {"source": "dsp_slides_sampling_quantization.pdf", "page": 2},
+      {"source": "handwritten_bilinear_transform.pdf", "page": 5}
+    ],
+    "expected_answer": "The sampling rate F_s defines T = 1/F_s. In the handwritten worked example, with F_s = 10 kHz and cutoff f_c = 1 kHz, Omega_c = 2*F_s*tan(pi*f_c / F_s) = 20000 * tan(0.1*pi) = 6498.39 rad/s, showing how sampling rate directly scales the prewarped analog cutoff frequency."
+  },
+  {
+    "id": 13,
+    "query": "Compare the Butterworth filter order formula derived in the handwritten notes with the filter design parameters in the lecture notes.",
+    "category": "multi_source",
+    "ground_truth_pages": [
+      {"source": "dsp_lecture_notes.pdf", "page": 22},
+      {"source": "handwritten_bilinear_transform.pdf", "page": 3}
+    ],
+    "expected_answer": "Both documents establish that the minimum order N of a Butterworth lowpass filter depends on passband ripple alpha_p at Omega_p and stopband attenuation alpha_s at Omega_s: N = ceil(log10((10^{0.1*alpha_s}-1)/(10^{0.1*alpha_p}-1)) / (2*log10(Omega_s/Omega_p)))."
+  },
+  {
+    "id": 14,
+    "query": "How do anti-aliasing pre-filtering in the slides and the impulse invariance method in the lecture notes handle the problem of aliasing in digital systems?",
+    "category": "multi_source",
+    "ground_truth_pages": [
+      {"source": "dsp_slides_sampling_quantization.pdf", "page": 4},
+      {"source": "dsp_lecture_notes.pdf", "page": 19}
+    ],
+    "expected_answer": "Anti-aliasing analog pre-filters in the slides bandlimit the continuous signal to below F_s/2 prior to sampling. In contrast, the impulse invariance method in the lecture notes samples the analog impulse response directly, which inherently suffers from aliasing unless the analog prototype has steep roll-off."
+  },
+  {
+    "id": 15,
+    "query": "Compare circular convolution from the lecture notes with the circular shift and matrix formulation in the algorithms cheatsheet.",
+    "category": "multi_source",
+    "ground_truth_pages": [
+      {"source": "dsp_lecture_notes.pdf", "page": 10},
+      {"source": "dsp_algorithms_cheatsheet.md", "page": 2}
+    ],
+    "expected_answer": "The lecture notes introduce circular convolution as periodic convolution modulo N, while the cheatsheet formalizes it as a circulant matrix multiplication y = H_c * x, where each row is a circularly right-shifted version of the sequence."
+  },
+  {
+    "id": 16,
+    "query": "Synthesize how Decimation-in-Time FFT from the lecture notes and the Twiddle factor symmetry from the markdown cheatsheet enable efficient butterfly operations.",
+    "category": "multi_source",
+    "ground_truth_pages": [
+      {"source": "dsp_lecture_notes.pdf", "page": 11},
+      {"source": "dsp_algorithms_cheatsheet.md", "page": 1}
+    ],
+    "expected_answer": "DIT FFT splits the N-point DFT into even and odd indexed halves. Twiddle factor symmetry W_N^{k + N/2} = -W_N^k allows the butterfly operation to compute two outputs with only a single complex multiplication: X[k] = G[k] + W_N^k H[k] and X[k+N/2] = G[k] - W_N^k H[k]."
+  },
+  {
+    "id": 17,
+    "query": "Compare the Kaiser window design in the lecture notes with the Parks-McClellan (Remez Exchange) algorithm in the cheatsheet for FIR filter design.",
+    "category": "multi_source",
+    "ground_truth_pages": [
+      {"source": "dsp_lecture_notes.pdf", "page": 16},
+      {"source": "dsp_algorithms_cheatsheet.md", "page": 6}
+    ],
+    "expected_answer": "Kaiser windowing provides a parameterized Bessel window that trades off transition width and ripple, but yields suboptimal equiripple behavior. Parks-McClellan uses Chebyshev alternation to find the optimal equiripple filter meeting the exact passband and stopband specifications with the lowest order."
+  },
+  {
+    "id": 18,
+    "query": "Explain how zero-input limit cycles and overflow arithmetic in the lecture notes are handled in the handwritten notes and the fixed-point cheatsheet.",
+    "category": "multi_source",
+    "ground_truth_pages": [
+      {"source": "dsp_lecture_notes.pdf", "page": 26},
+      {"source": "handwritten_bilinear_transform.pdf", "page": 7},
+      {"source": "dsp_algorithms_cheatsheet.md", "page": 9}
+    ],
+    "expected_answer": "Zero-input limit cycles occur due to quantization/rounding in recursive IIR feedback loops. In the handwritten notes and cheatsheet, limit cycle oscillations are prevented using magnitude truncation (truncating towards zero) and overflow limit cycles are eliminated using saturation arithmetic instead of two's complement wrap-around."
+  },
+  {
+    "id": 19,
+    "query": "Contrast the continuous signal reconstruction using ideal sinc interpolation in the slides with the Decimation and Interpolation multirate filter banks.",
+    "category": "multi_source",
+    "ground_truth_pages": [
+      {"source": "dsp_slides_sampling_quantization.pdf", "page": 5},
+      {"source": "dsp_slides_sampling_quantization.pdf", "page": 14}
+    ],
+    "expected_answer": "Ideal sinc interpolation reconstructs continuous-time signals by summing infinite sinc kernels x(t) = sum x[n] sinc((t-nT)/T). In multirate DSP, digital interpolation by factor L inserts L-1 zeros between discrete samples, followed by a digital lowpass anti-imaging filter with cutoff pi/L."
+  },
+  {
+    "id": 20,
+    "query": "Synthesize the trade-offs between FIR and IIR filters as documented across the lecture notes and the handwritten comparison table.",
+    "category": "multi_source",
+    "ground_truth_pages": [
+      {"source": "dsp_lecture_notes.pdf", "page": 14},
+      {"source": "dsp_lecture_notes.pdf", "page": 18},
+      {"source": "handwritten_bilinear_transform.pdf", "page": 8}
+    ],
+    "expected_answer": "FIR filters can achieve exact linear phase and are inherently stable (all poles at z=0), but require higher filter orders and more memory. IIR filters achieve sharper transition bands with significantly lower order, but have non-linear phase response and can become unstable or exhibit limit cycle oscillations under finite wordlength effects."
+  },
+  {
+    "id": 21,
+    "query": "What is the Kalman filter state estimation equation for linear dynamical systems with white Gaussian noise?",
+    "category": "refusal",
+    "ground_truth_pages": [],
+    "expected_answer": null
+  },
+  {
+    "id": 22,
+    "query": "Explain the Continuous Wavelet Transform (CWT) and its scaling parameter in Morlet wavelet decomposition.",
+    "category": "refusal",
+    "ground_truth_pages": [],
+    "expected_answer": null
+  },
+  {
+    "id": 23,
+    "query": "How is the 2D Discrete Cosine Transform (DCT-II) formulated for JPEG image compression block encoding?",
+    "category": "refusal",
+    "ground_truth_pages": [],
+    "expected_answer": null
+  },
+  {
+    "id": 24,
+    "query": "Describe the Least Mean Squares (LMS) adaptive filter weight update algorithm and its step-size convergence bounds.",
+    "category": "refusal",
+    "ground_truth_pages": [],
+    "expected_answer": null
+  },
+  {
+    "id": 25,
+    "query": "How does the Viterbi algorithm perform maximum likelihood sequence estimation in convolutional decoding?",
+    "category": "refusal",
+    "ground_truth_pages": [],
+    "expected_answer": null
+  },
+  {
+    "id": 26,
+    "query": "Explain the Levinson-Durbin recursion algorithm for solving the Yule-Walker equations in Linear Predictive Coding (LPC).",
+    "category": "refusal",
+    "ground_truth_pages": [],
+    "expected_answer": null
+  },
+  {
+    "id": 27,
+    "query": "What is the Cepstrum representation and how is homomorphic deconvolution used for speech pitch detection?",
+    "category": "refusal",
+    "ground_truth_pages": [],
+    "expected_answer": null
+  },
+  {
+    "id": 28,
+    "query": "Explain the difference between Hard and Soft thresholding in wavelet shrinkage denoising by Donoho and Johnstone.",
+    "category": "refusal",
+    "ground_truth_pages": [],
+    "expected_answer": null
+  },
+  {
+    "id": 29,
+    "query": "How does the FastICA algorithm extract independent components using kurtosis and negentropy maximization?",
+    "category": "refusal",
+    "ground_truth_pages": [],
+    "expected_answer": null
+  },
+  {
+    "id": 30,
+    "query": "What is the architecture of a recursive Least Squares (RLS) lattice filter and its forgetting factor lambda?",
+    "category": "refusal",
+    "ground_truth_pages": [],
+    "expected_answer": null
+  }
+]

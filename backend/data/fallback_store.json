@@ -1,0 +1,207 @@
+{
+  "chat_sessions": [],
+  "documents": [],
+  "evaluation_runs": [
+    {
+      "run_id": "eval_20260912_122038_30f824b1",
+      "timestamp": "2026-09-12T12:21:05.480772",
+      "summary": {
+        "total_questions": 6,
+        "target_questions": 6,
+        "target_passed": 6,
+        "refusal_questions": 0,
+        "refusal_passed": 0,
+        "refusal_rate": 0.0,
+        "citation_accuracy": 100.0,
+        "overall_passed": 0,
+        "overall_accuracy": 0.0
+      },
+      "details": [
+        {
+          "id": 1,
+          "query": "What is the condition for a linear time-invariant discrete-time system to be stable in terms of its impulse response?",
+          "category": "single_source",
+          "ground_truth_pages": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page": 1
+            }
+          ],
+          "expected_answer": "A discrete-time LTI system is bounded-input bounded-output (BIBO) stable if and only if its impulse response h[n] is absolutely summable, i.e., sum_{n=-inf}^{inf} |h[n]| < inf.",
+          "predicted_answer": "A discrete-time LTI system is bounded-input bounded-output (BIBO) stable if and only if its impulse response h[n] is absolutely summable, meaning that sum_{k = -inf}^{inf} |h[k]| < inf [Source: dsp_lecture_notes.pdf, Page: 1].",
+          "predicted_citations": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 1,
+              "text_snippet": "A discrete-time LTI system is bounded-input bounded-output (BIBO) stable if and only if its impulse response h[n] is absolutely summable: sum_{k = -inf}^{inf} |h[k]| < inf."
+            }
+          ],
+          "is_refusal": false,
+          "citation_correct": true,
+          "refusal_correct": false,
+          "passed": true
+        },
+        {
+          "id": 2,
+          "query": "State the symmetry and periodicity properties of the Discrete-Time Fourier Transform (DTFT).",
+          "category": "single_source",
+          "ground_truth_pages": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page": 4
+            }
+          ],
+          "expected_answer": "DTFT is periodic in frequency with period 2*pi (X(omega + 2*pi) = X(omega)). For real-valued sequences, X(e^{j*omega}) has conjugate symmetry: X(e^{-j*omega}) = X^*(e^{j*omega}).",
+          "predicted_answer": "The Discrete-Time Fourier Transform (DTFT) is strictly periodic with a fundamental period of 2*pi: X(e^{j*(omega + 2*pi)}) = X(e^{j*omega}) [Source: dsp_lecture_notes.pdf, Page: 3]. Furthermore, for a real-valued sequence x[n], the DTFT exhibits the following symmetry properties: X(e^{-j*omega}) = X^*(e^{j*omega}), its magnitude |X(e^{-j*omega})| = |X(e^{j*omega})| is an even function, and its phase arg{X(e^{-j*omega})} = -arg{X(e^{j*omega})} is an odd function [Source: dsp_lecture_notes.pdf, Page: 4].",
+          "predicted_citations": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 3,
+              "text_snippet": "Periodicity: X(e^{j*omega}) is strictly periodic with fundamental period 2*pi:\n    X(e^{j*(omega + 2*pi)}) = X(e^{j*omega})."
+            },
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 4,
+              "text_snippet": "4. Conjugation & Symmetry: For a real-valued sequence x[n]:\n    X(e^{-j*omega}) = X^*(e^{j*omega})\n    |X(e^{-j*omega})| = |X(e^{j*omega})| (Magnitude is an even function)\n    arg{X(e^{-j*omega})} = -arg{X(e^{j*omega})} (Phase is an odd function)"
+            }
+          ],
+          "is_refusal": false,
+          "citation_correct": true,
+          "refusal_correct": false,
+          "passed": true
+        },
+        {
+          "id": 3,
+          "query": "What are the ROC properties of the Z-transform for a right-sided sequence?",
+          "category": "single_source",
+          "ground_truth_pages": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page": 5
+            }
+          ],
+          "expected_answer": "For a right-sided sequence, the Region of Convergence (ROC) is the exterior of a circle of radius r_max, extending outward to infinity (including z = inf if the sequence is causal).",
+          "predicted_answer": "For a right-sided sequence, the Region of Convergence (ROC) extends outward from the outermost pole to infinity (|z| > r_max) [Source: dsp_lecture_notes.pdf, Page: 5].",
+          "predicted_citations": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 5,
+              "text_snippet": "For a right-sided sequence, the ROC extends outward from the outermost pole to infinity (|z| > r_max)."
+            }
+          ],
+          "is_refusal": false,
+          "citation_correct": true,
+          "refusal_correct": false,
+          "passed": true
+        },
+        {
+          "id": 4,
+          "query": "What is the difference between circular convolution and linear convolution, and how many zero-padded samples are needed to avoid time-aliasing?",
+          "category": "single_source",
+          "ground_truth_pages": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page": 10
+            }
+          ],
+          "expected_answer": "Circular convolution convolves two periodic or modulo-N sequences, whereas linear convolution operates on aperiodic sequences. To obtain linear convolution using DFT of length N without time-aliasing, N must be at least L + M - 1, where L and M are the lengths of the sequences.",
+          "predicted_answer": "Circular convolution involves modulo-N indexing where sequences are periodically extended, defined as x3[n] = sum_{m=0}^{N-1} x1[m] * x2[((n - m))_N] [Source: dsp_lecture_notes.pdf, Page: 10], and can be represented in a circulant matrix form where every row is a circular right-shift of the previous row [Source: dsp_algorithms_cheatsheet.md, Page: 2]. In contrast, linear convolution for an arbitrary input and LTI system response is given by the convolution sum y[n] = x[n] * h[n] = sum_{k=-inf}^{inf} x[k] h[n - k] [Source: dsp_lecture_notes.pdf, Page: 2]. If sequences x1[n] and x2[n] have lengths L and M, their linear convolution has a length of L + M - 1 [Source: dsp_lecture_notes.pdf, Page: 10]. To avoid time-domain aliasing when computing linear convolution using the DFT, both sequences must be zero-padded to a length N >= L + M - 1 [Source: dsp_lecture_notes.pdf, Page: 10].",
+          "predicted_citations": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 10,
+              "text_snippet": "The circular convolution of two N-point sequences x1[n] and x2[n] is defined as: x3[n] = sum_{m=0}^{N-1} x1[m] * x2[((n - m))_N], where ((n))_N denotes modulo-N indexing."
+            },
+            {
+              "source": "dsp_algorithms_cheatsheet.md",
+              "page_number": 2,
+              "text_snippet": "Every row is a circular right-shift of the previous row."
+            },
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 2,
+              "text_snippet": "y[n] = x[n] * h[n] = sum_{k=-inf}^{inf} x[k] h[n - k]."
+            },
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 10,
+              "text_snippet": "If x1[n] has length L and x2[n] has length M, their linear convolution has length L + M - 1. To compute linear convolution using the DFT without time-domain aliasing, both sequences must be zero-padded to a length N >= L + M - 1 before computing the N-point DFT and IDFT."
+            }
+          ],
+          "is_refusal": false,
+          "citation_correct": true,
+          "refusal_correct": false,
+          "passed": true
+        },
+        {
+          "id": 5,
+          "query": "Explain the computational complexity reduction of the Decimation-in-Time (DIT) Radix-2 FFT compared to direct DFT.",
+          "category": "single_source",
+          "ground_truth_pages": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page": 11
+            }
+          ],
+          "expected_answer": "Direct computation of an N-point DFT requires N^2 complex multiplications and N(N-1) complex additions. Radix-2 DIT FFT reduces this to (N/2)*log2(N) complex multiplications and N*log2(N) complex additions.",
+          "predicted_answer": "The direct N-point DFT requires N^2 complex multiplications and N(N-1) complex additions [Source: dsp_lecture_notes.pdf, Page: 11]. In contrast, the Radix-2 Decimation-in-Time (DIT) FFT reduces this computational complexity to (N/2)*log2(N) complex multiplications and N*log2(N) complex additions [Source: dsp_lecture_notes.pdf, Page: 11]. For example, when N = 1024, a direct DFT requires 1,048,576 complex multiplications, whereas the Radix-2 DIT FFT requires only 5,120 multiplications [Source: dsp_lecture_notes.pdf, Page: 11].",
+          "predicted_citations": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 11,
+              "text_snippet": "Direct N-point DFT: N^2 complex multiplications, N(N-1) complex additions."
+            },
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 11,
+              "text_snippet": "Radix-2 DIT FFT: (N/2)*log2(N) complex multiplications, N*log2(N) complex additions."
+            },
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 11,
+              "text_snippet": "For N = 1024, direct DFT requires 1,048,576 complex multiplications, whereas FFT requires only 5,120 multiplications."
+            }
+          ],
+          "is_refusal": false,
+          "citation_correct": true,
+          "refusal_correct": false,
+          "passed": true
+        },
+        {
+          "id": 6,
+          "query": "What are the characteristics of Hamming and Blackman window functions used in FIR filter design?",
+          "category": "single_source",
+          "ground_truth_pages": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page": 15
+            }
+          ],
+          "expected_answer": "Hamming window has a mainlobe width of 8*pi/M and peak sidelobe attenuation of -43 dB. Blackman window provides higher stopband attenuation of -74 dB at the cost of a wider mainlobe width of 12*pi/M.",
+          "predicted_answer": "The characteristics of the Hamming and Blackman window functions in FIR filter design are as follows:\n- Hamming: Mainlobe width = 8*pi/M, Peak sidelobe = -43 dB, Min stopband attenuation = 53 dB [Source: dsp_lecture_notes.pdf, Page: 15].\n- Blackman: Mainlobe width = 12*pi/M, Peak sidelobe = -58 dB, Min stopband attenuation = 74 dB [Source: dsp_lecture_notes.pdf, Page: 15].\nAdditionally, there is a trade-off where increasing sidelobe attenuation widens the mainlobe width, yielding a wider transition bandwidth [Source: dsp_lecture_notes.pdf, Page: 15].",
+          "predicted_citations": [
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 15,
+              "text_snippet": "4. Hamming: Mainlobe width = 8*pi/M, Peak sidelobe = -43 dB, Min stopband = 53 dB."
+            },
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 15,
+              "text_snippet": "5. Blackman: Mainlobe width = 12*pi/M, Peak sidelobe = -58 dB, Min stopband = 74 dB."
+            },
+            {
+              "source": "dsp_lecture_notes.pdf",
+              "page_number": 15,
+              "text_snippet": "Trade-off: As sidelobe attenuation increases, mainlobe width widens, yielding a wider transition bandwidth."
+            }
+          ],
+          "is_refusal": false,
+          "citation_correct": true,
+          "refusal_correct": false,
+          "passed": true
+        }
+      ]
+    }
+  ]
+}
