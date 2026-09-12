@@ -10,14 +10,17 @@ from backend.config import settings
 class MultimodalParser:
     def __init__(self):
         self._vlm = None
+        self._cached_key = None
 
     @property
     def vlm(self):
-        if self._vlm is None:
+        current_key = settings.GEMINI_API_KEY
+        if self._vlm is None or self._cached_key != current_key:
             self._vlm = ChatGoogleGenerativeAI(
                 model=settings.OCR_MODEL,
-                google_api_key=settings.GEMINI_API_KEY
+                google_api_key=current_key
             )
+            self._cached_key = current_key
         return self._vlm
 
     def render_pdf_page_to_base64(self, pdf_path: Path, page_index: int) -> str:

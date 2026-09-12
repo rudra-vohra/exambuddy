@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, BookOpen, AlertCircle, ShieldAlert, CheckCircle2, Loader2 } from 'lucide-react';
+import { Send, BookOpen, AlertCircle, ShieldAlert, Loader2 } from 'lucide-react';
 
 const cleanAnswerText = (text) => {
   if (!text) return '';
@@ -144,15 +144,10 @@ export default function ChatView({
                 {/* Status Header */}
                 <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
                   <div className="flex items-center space-x-2">
-                    {msg.refusal ? (
+                    {msg.refusal && (
                       <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-950/60 text-rose-400 border border-rose-800/50">
                         <ShieldAlert className="w-3.5 h-3.5" />
                         <span>OUT-OF-CORPUS REFUSAL</span>
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-950/60 text-emerald-400 border border-emerald-800/50">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>STRICT COURSE GROUNDING</span>
                       </span>
                     )}
                   </div>

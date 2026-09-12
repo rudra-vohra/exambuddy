@@ -1,11 +1,14 @@
 import json
 import os
+import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 from backend.config import settings
+
+logger = logging.getLogger(__name__)
 
 LOCAL_STORAGE_DIR = Path(__file__).resolve().parent.parent / "data"
 LOCAL_STORAGE_DIR.mkdir(parents=True, exist_ok=True)
@@ -106,6 +109,9 @@ class DatabaseService:
             "ocr_applied": ocr_applied,
             "created_at": datetime.utcnow().isoformat()
         }
+        if not self.is_connected or self.db is None:
+            await self.connect()
+
         if self.is_connected and self.db is not None:
             try:
                 await self.db.documents.update_one(
@@ -113,9 +119,8 @@ class DatabaseService:
                     {"$set": doc_entry},
                     upsert=True
                 )
-                return
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"MongoDB record_document error: {e}")
 
         data = self._read_local_store()
         docs = [d for d in data.get("documents", []) if d.get("source") != source]
@@ -124,18 +129,35 @@ class DatabaseService:
         self._write_local_store(data)
 
     async def list_documents(self) -> List[Dict[str, Any]]:
+        if not self.is_connected or self.db is None:
+            await self.connect()
+
         if self.is_connected and self.db is not None:
             try:
                 cursor = self.db.documents.find({}).sort("created_at", -1)
                 items = await cursor.to_list(length=100)
                 for item in items:
                     item.pop("_id", None)
-                return items
+                if items:
+                    return items
+            except Exception as e:
+                logger.error(f"MongoDB list_documents error: {e}")
+
+        data = self._read_local_store()
+        return data.get("documents", [])
+
+    async def delete_document(self, source: str) -> bool:
+        if self.is_connected and self.db is not None:
+            try:
+                await self.db.documents.delete_many({"source": source})
+                await self.db.chunks.delete_many({"source": source})
             except Exception:
                 pass
 
         data = self._read_local_store()
-        return data.get("documents", [])
+        data["documents"] = [d for d in data.get("documents", []) if d.get("source") != source]
+        self._write_local_store(data)
+        return True
 
     async def save_evaluation_run(self, run_id: str, summary: Dict[str, Any], details: List[Dict[str, Any]]):
         run_entry = {

@@ -59,6 +59,23 @@ async def upload_document(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ingestion failed: {str(e)}")
 
+@router.delete("/{source}")
+async def delete_document(source: str):
+    source = source.strip()
+    if not source:
+        raise HTTPException(status_code=400, detail="Source document name required.")
+
+    try:
+        res = await ingestion_service.delete_document(source)
+        return {
+            "status": "success",
+            "message": f"Document '{source}' deleted successfully from vector database, MongoDB, and storage.",
+            "details": res
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete document: {str(e)}")
+
+
 @router.get("/page-preview", response_model=PagePreviewResponse)
 async def get_page_preview(
     source: str = Query(..., description="Document source name"),

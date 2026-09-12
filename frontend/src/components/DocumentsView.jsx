@@ -1,11 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, UploadCloud, CheckCircle2, Image as ImageIcon, Layers, FileCode, Presentation, RefreshCw, Loader2 } from 'lucide-react';
+import { FileText, UploadCloud, CheckCircle2, Image as ImageIcon, Layers, FileCode, Presentation, RefreshCw, Loader2, Trash2, X } from 'lucide-react';
 
 export default function DocumentsView({ onSelectCitation, apiBase = 'http://localhost:8000' }) {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
+  const [deletingSource, setDeletingSource] = useState(null);
+
+  const handleDeleteDocument = async (sourceName) => {
+    if (!window.confirm(`Delete "${sourceName}" from course materials, Qdrant vector database, and MongoDB?`)) {
+      return;
+    }
+
+    setDeletingSource(sourceName);
+    try {
+      const res = await fetch(`${apiBase}/api/documents/${encodeURIComponent(sourceName)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Delete failed');
+
+      setUploadStatus({
+        type: 'success',
+        msg: `Successfully deleted ${sourceName}: ${data.details?.points_deleted ?? 0} vectors removed from database.`
+      });
+      fetchDocs();
+    } catch (err) {
+      setUploadStatus({
+        type: 'error',
+        msg: `Error deleting document: ${err.message}`
+      });
+    } finally {
+      setDeletingSource(null);
+    }
+  };
 
   useEffect(() => {
     if (!uploadStatus) return;
@@ -153,10 +182,10 @@ export default function DocumentsView({ onSelectCitation, apiBase = 'http://loca
             <span className="flex-1 text-left">{uploadStatus.msg}</span>
             <button
               onClick={() => setUploadStatus(null)}
-              className="text-slate-400 hover:text-slate-200 px-1.5 py-0.5 rounded text-xs transition-colors"
+              className="text-slate-400 hover:text-slate-200 p-1 rounded text-xs transition-colors"
               title="Dismiss"
             >
-              ✕
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
@@ -184,9 +213,23 @@ export default function DocumentsView({ onSelectCitation, apiBase = 'http://loca
                     <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
                       {getFormatIcon(doc.format)}
                     </div>
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                      {doc.format.toUpperCase()}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                        {doc.format.toUpperCase()}
+                      </span>
+                      <button
+                        onClick={() => handleDeleteDocument(doc.source)}
+                        disabled={deletingSource === doc.source}
+                        title={`Delete ${doc.source} from database`}
+                        className="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-900/50 transition-colors disabled:opacity-50"
+                      >
+                        {deletingSource === doc.source ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
                   </div>
 
                   <h4 className="text-sm font-semibold text-slate-100 break-all mb-1 font-mono">

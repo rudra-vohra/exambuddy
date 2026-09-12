@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     TOP_K: int = Field(default=6)
 
     model_config = SettingsConfigDict(
-        env_file=(BASE_DIR / ".env", BASE_DIR / "rag" / ".env"),
+        env_file=BASE_DIR / ".env",
         env_file_encoding="utf-8",
         extra="ignore"
     )

@@ -43,14 +43,17 @@ If the excerpts do NOT contain the answer:
 class GeneratorService:
     def __init__(self):
         self._client = None
+        self._cached_key = None
 
     @property
     def client(self) -> OpenAI:
-        if self._client is None:
+        current_key = settings.GEMINI_API_KEY
+        if self._client is None or self._cached_key != current_key:
             self._client = OpenAI(
-                api_key=settings.GEMINI_API_KEY,
+                api_key=current_key,
                 base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
             )
+            self._cached_key = current_key
         return self._client
 
     def reformulate_query(self, query: str, chat_history: Optional[List[Dict[str, Any]]] = None) -> str:
