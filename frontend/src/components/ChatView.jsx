@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, BookOpen, AlertCircle, ShieldAlert, Loader2 } from 'lucide-react';
+import { Send, AlertCircle, ShieldAlert, FileText, Image as ImageIcon, Presentation, FileCode } from 'lucide-react';
 
 const cleanAnswerText = (text) => {
   if (!text) return '';
@@ -10,6 +10,48 @@ const cleanAnswerText = (text) => {
     .replace(/\s+([.,;:!?])/g, '$1')
     .replace(/  +/g, ' ')
     .trim();
+};
+
+const getCitationIcon = (citation) => {
+  const source = (citation?.source || '').toLowerCase();
+  const format = (citation?.format || '').toLowerCase();
+
+  if (
+    format === 'handwritten_image' ||
+    format === 'image' ||
+    source.endsWith('.png') ||
+    source.endsWith('.jpg') ||
+    source.endsWith('.jpeg') ||
+    source.endsWith('.webp') ||
+    source.includes('scanned') ||
+    source.includes('image')
+  ) {
+    return <ImageIcon className="w-3 h-3 text-amber-400 shrink-0" />;
+  }
+
+  if (
+    format === 'slides' ||
+    source.includes('slide') ||
+    source.endsWith('.ppt') ||
+    source.endsWith('.pptx')
+  ) {
+    return <Presentation className="w-3 h-3 text-indigo-400 shrink-0" />;
+  }
+
+  if (
+    format === 'markdown' ||
+    source.endsWith('.md') ||
+    source.endsWith('.txt') ||
+    source.endsWith('.json')
+  ) {
+    return <FileCode className="w-3 h-3 text-emerald-400 shrink-0" />;
+  }
+
+  if (source.endsWith('.pdf')) {
+    return <FileText className="w-3 h-3 text-rose-400 shrink-0" />;
+  }
+
+  return <FileText className="w-3 h-3 text-blue-400 shrink-0" />;
 };
 
 const DEFAULT_INIT_MESSAGES = [
@@ -40,6 +82,7 @@ export default function ChatView({
 
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
   const sessionIdRef = useRef('session-' + Date.now());
 
   const scrollToBottom = () => {
@@ -49,6 +92,12 @@ export default function ChatView({
   useEffect(() => {
     scrollToBottom();
   }, [messages, loading]);
+
+  useEffect(() => {
+    if (inputQuery && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [inputQuery]);
 
   const handleSubmit = async (queryText) => {
     const q = (queryText || inputQuery).trim();
@@ -141,18 +190,15 @@ export default function ChatView({
               </div>
             ) : (
               <div className="max-w-3xl w-full bg-slate-900/90 border border-slate-800/90 rounded-2xl rounded-tl-sm p-4 sm:p-5 shadow-lg space-y-3">
-                {/* Status Header */}
-                <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
-                  <div className="flex items-center space-x-2">
-                    {msg.refusal && (
-                      <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-950/60 text-rose-400 border border-rose-800/50">
-                        <ShieldAlert className="w-3.5 h-3.5" />
-                        <span>OUT-OF-CORPUS REFUSAL</span>
-                      </span>
-                    )}
+                {/* Refusal Header */}
+                {msg.refusal && (
+                  <div className="flex items-center border-b border-slate-800/80 pb-2.5">
+                    <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-950/60 text-rose-400 border border-rose-800/50">
+                      <ShieldAlert className="w-3.5 h-3.5" />
+                      <span>INVALID QUESTION</span>
+                    </span>
                   </div>
-                  <span className="text-[11px] font-mono text-slate-500">Gemini 3.5 Flash Lite</span>
-                </div>
+                )}
 
                 {/* Answer Text */}
                 <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-wrap">
@@ -172,7 +218,7 @@ export default function ChatView({
                           onClick={() => onSelectCitation(cit)}
                           className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-md text-xs font-mono bg-blue-950/50 hover:bg-blue-900/60 text-blue-300 border border-blue-800/60 hover:border-blue-700 transition-colors shadow-sm"
                         >
-                          <BookOpen className="w-3 h-3 text-blue-400" />
+                          {getCitationIcon(cit)}
                           <span>{cit.source}</span>
                           <span className="bg-blue-900/80 px-1.5 py-0.2 rounded text-blue-200 font-bold">
                             p.{cit.page_number}
@@ -189,9 +235,10 @@ export default function ChatView({
 
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-4 flex items-center space-x-3 text-slate-400 text-sm">
-              <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
-              <span className="font-mono text-xs">Retrieving vectors across course documents and synthesizing strictly grounded response...</span>
+            <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl rounded-tl-sm px-4 py-3.5 flex items-center space-x-1.5 shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-slate-400 animate-typing-1" />
+              <span className="w-2 h-2 rounded-full bg-slate-400 animate-typing-2" />
+              <span className="w-2 h-2 rounded-full bg-slate-400 animate-typing-3" />
             </div>
           </div>
         )}
@@ -209,10 +256,11 @@ export default function ChatView({
           className="relative flex items-center"
         >
           <input
+            ref={inputRef}
             type="text"
             value={inputQuery}
             onChange={(e) => setInputQuery(e.target.value)}
-            placeholder="Ask an exam question (strictly answered with exact document page citations)..."
+            placeholder="Ask anything..."
             disabled={loading}
             className="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl px-4 py-3 pr-12 text-sm text-slate-100 placeholder-slate-500 transition-all outline-none"
           />
@@ -224,9 +272,6 @@ export default function ChatView({
             <Send className="w-4 h-4" />
           </button>
         </form>
-        <p className="mt-1.5 text-[11px] text-center text-slate-500 font-mono">
-          Out-of-corpus questions are strictly refused. Zero parametric hallucination policy.
-        </p>
       </div>
     </div>
   );

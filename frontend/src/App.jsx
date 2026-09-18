@@ -37,6 +37,28 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
+  const handleAskAboutDocument = (doc) => {
+    const source = (doc?.source || '').trim();
+    const ext = source.split('.').pop()?.toLowerCase();
+    const format = (doc?.format || '').toLowerCase();
+
+    let question = `What topics are covered in this document ${source}?`;
+    if (format === 'pdf' || ext === 'pdf') {
+      question = `What topics are covered in this pdf ${source}?`;
+    } else if (format === 'slides' || ext === 'ppt' || ext === 'pptx') {
+      question = `What topics are covered in these slides ${source}?`;
+    } else if (
+      format === 'handwritten_image' ||
+      format === 'image' ||
+      ['png', 'jpg', 'jpeg', 'webp'].includes(ext)
+    ) {
+      question = `What topics are covered in these notes ${source}?`;
+    }
+
+    setChatInput(question);
+    setActiveTab('chat');
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} health={health} />
@@ -53,7 +75,11 @@ export default function App() {
           />
         </div>
         <div className={activeTab === 'documents' ? 'block' : 'hidden'}>
-          <DocumentsView onSelectCitation={setSelectedCitation} apiBase={API_BASE} />
+          <DocumentsView
+            onSelectCitation={setSelectedCitation}
+            onAskAboutDocument={handleAskAboutDocument}
+            apiBase={API_BASE}
+          />
         </div>
         <div className={activeTab === 'benchmark' ? 'block' : 'hidden'}>
           <BenchmarkView onSelectCitation={setSelectedCitation} apiBase={API_BASE} />

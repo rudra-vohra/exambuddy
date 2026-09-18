@@ -1,6 +1,8 @@
 import logging
-from typing import List, Dict, Any, Tuple
+import re
+from typing import List, Dict, Any, Tuple, Optional
 from langchain_qdrant import QdrantVectorStore
+from qdrant_client.http import models
 from backend.config import settings
 from backend.services.ingestion import ingestion_service
 
@@ -10,17 +12,44 @@ class RetrieverService:
     def __init__(self):
         self._query_cache: Dict[str, List[Dict[str, Any]]] = {}
 
+    def extract_target_source(self, query: str) -> Optional[str]:
+        # Match filenames with extensions e.g. test_text.pdf, slides.pdf, notes.png, doc.md
+        matches = re.findall(r'[\w\-\.]+\.(?:pdf|png|jpg|jpeg|webp|md|txt|pptx|ppt)', query, re.IGNORECASE)
+        if matches:
+            return matches[0].strip('[]() ')
+        return None
+
     def retrieve(self, query: str, top_k: int = None) -> List[Dict[str, Any]]:
         k = top_k or settings.TOP_K
-        cache_key = f"{query.strip().lower()}_{k}"
+        target_source = self.extract_target_source(query)
+
+        # For document overview / topic queries, expand k to ensure comprehensive topic coverage
+        if target_source and any(w in query.lower() for w in ['topic', 'cover', 'chapter', 'syllabus', 'about', 'overview', 'content']):
+            k = max(k, 8)
+
+        cache_key = f"{query.strip().lower()}_{k}_{target_source or 'all'}"
         if cache_key in self._query_cache:
             return self._query_cache[cache_key]
 
         vector_store = ingestion_service.get_vector_store()
         results_with_score = []
+
+        # If a specific document source is detected, search strictly within that document
+        filter_condition = None
+        if target_source:
+            filter_condition = models.Filter(
+                must=[models.FieldCondition(key="metadata.source", match=models.MatchValue(value=target_source))]
+            )
+
         for attempt in range(3):
             try:
-                results_with_score = vector_store.similarity_search_with_score(query=query, k=k)
+                if filter_condition:
+                    results_with_score = vector_store.similarity_search_with_score(query=query, k=k, filter=filter_condition)
+                    # If filtered search returned nothing (e.g. filename slight mismatch), fallback to unfiltered
+                    if not results_with_score:
+                        results_with_score = vector_store.similarity_search_with_score(query=query, k=k)
+                else:
+                    results_with_score = vector_store.similarity_search_with_score(query=query, k=k)
                 break
             except Exception as e:
                 logger.warning(f"Qdrant retrieve attempt {attempt + 1} failed: {e}")

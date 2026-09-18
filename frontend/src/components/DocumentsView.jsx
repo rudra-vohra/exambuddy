@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, UploadCloud, CheckCircle2, Image as ImageIcon, Layers, FileCode, Presentation, RefreshCw, Loader2, Trash2, X } from 'lucide-react';
+import { FileText, UploadCloud, CheckCircle2, Image as ImageIcon, Layers, FileCode, Presentation, RefreshCw, Loader2, Trash2, X, Bot } from 'lucide-react';
 
-export default function DocumentsView({ onSelectCitation, apiBase = 'http://localhost:8000' }) {
+export default function DocumentsView({ onSelectCitation, onAskAboutDocument, apiBase = 'http://localhost:8000' }) {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -96,17 +96,56 @@ export default function DocumentsView({ onSelectCitation, apiBase = 'http://loca
     }
   };
 
-  const getFormatIcon = (format) => {
-    switch (format) {
-      case 'slides':
-        return <Presentation className="w-5 h-5 text-indigo-400" />;
-      case 'markdown':
-        return <FileCode className="w-5 h-5 text-emerald-400" />;
-      case 'handwritten_image':
-        return <ImageIcon className="w-5 h-5 text-amber-400" />;
-      default:
-        return <FileText className="w-5 h-5 text-blue-400" />;
+  const getDocIcon = (doc) => {
+    const format = (doc?.format || '').toLowerCase();
+    const source = (doc?.source || '').toLowerCase();
+
+    if (format === 'slides' || source.endsWith('.ppt') || source.endsWith('.pptx') || source.includes('slide')) {
+      return <Presentation className="w-5 h-5 text-indigo-400" />;
     }
+    if (format === 'markdown' || source.endsWith('.md') || source.endsWith('.txt')) {
+      return <FileCode className="w-5 h-5 text-emerald-400" />;
+    }
+    if (
+      format === 'handwritten_image' ||
+      format === 'image' ||
+      source.endsWith('.png') ||
+      source.endsWith('.jpg') ||
+      source.endsWith('.jpeg') ||
+      source.endsWith('.webp')
+    ) {
+      return <ImageIcon className="w-5 h-5 text-amber-400" />;
+    }
+    return <FileText className="w-5 h-5 text-blue-400" />;
+  };
+
+  const getAskButtonLabel = (doc) => {
+    const source = (doc?.source || '').toLowerCase();
+    const format = (doc?.format || '').toLowerCase();
+
+    if (format === 'pdf' || source.endsWith('.pdf')) {
+      return 'Ask Question from this PDF';
+    }
+    if (format === 'slides' || source.endsWith('.ppt') || source.endsWith('.pptx') || source.includes('slide')) {
+      return 'Ask Question from these Slides';
+    }
+    if (
+      format === 'handwritten_image' ||
+      format === 'image' ||
+      source.endsWith('.png') ||
+      source.endsWith('.jpg') ||
+      source.endsWith('.jpeg') ||
+      source.endsWith('.webp')
+    ) {
+      return 'Ask Question from these Notes';
+    }
+    return 'Ask Question from this Document';
+  };
+
+  const getFormatLabel = (format) => {
+    if (!format) return 'DOC';
+    if (format === 'handwritten_image' || format === 'image') return 'IMG';
+    return format.toUpperCase();
   };
 
   const totalPages = documents.reduce((acc, d) => acc + (d.total_pages || 0), 0);
@@ -118,9 +157,6 @@ export default function DocumentsView({ onSelectCitation, apiBase = 'http://loca
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-slate-900 border border-slate-800">
         <div>
           <h2 className="text-lg font-bold text-slate-100">Course Materials & Ingested Corpus</h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Multimodal dataset powering strict vector grounding across PDFs, slides, markdown, and handwritten scans.
-          </p>
         </div>
         <div className="flex items-center space-x-6 text-xs font-mono">
           <div>
@@ -211,11 +247,11 @@ export default function DocumentsView({ onSelectCitation, apiBase = 'http://loca
                 <div>
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
-                      {getFormatIcon(doc.format)}
+                      {getDocIcon(doc)}
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                        {doc.format.toUpperCase()}
+                        {getFormatLabel(doc.format)}
                       </span>
                       <button
                         onClick={() => handleDeleteDocument(doc.source)}
@@ -245,18 +281,14 @@ export default function DocumentsView({ onSelectCitation, apiBase = 'http://loca
                     <span>{doc.total_pages} Pages</span>
                     <span>{doc.chunks_count} Chunks</span>
                   </div>
-                  {doc.ocr_applied ? (
-                    <span className="text-amber-400 font-medium">Gemini OCR</span>
-                  ) : (
-                    <span className="text-slate-500">Digital Text</span>
-                  )}
                 </div>
 
                 <button
-                  onClick={() => onSelectCitation({ source: doc.source, page_number: 1, text_snippet: "" })}
-                  className="w-full py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors"
+                  onClick={() => onAskAboutDocument && onAskAboutDocument(doc)}
+                  className="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-md shadow-blue-600/20 flex items-center justify-center space-x-2 active:scale-[0.98]"
                 >
-                  Inspect Page 1 Evidence
+                  <Bot className="w-4 h-4" />
+                  <span>{getAskButtonLabel(doc)}</span>
                 </button>
               </div>
             ))}

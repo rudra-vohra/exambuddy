@@ -10,12 +10,28 @@
       "created_at": "2026-09-12T17:06:42.522904"
     },
     {
-      "source": "Week-3.pdf",
+      "source": "handwritten.pdf",
       "format": "pdf",
+      "total_pages": 9,
+      "chunks_count": 9,
+      "ocr_applied": true,
+      "created_at": "2026-09-12T17:36:30.596250"
+    },
+    {
+      "source": "slides.pdf",
+      "format": "slides",
       "total_pages": 105,
       "chunks_count": 105,
       "ocr_applied": false,
-      "created_at": "2026-09-12T17:12:37.684931"
+      "created_at": "2026-09-12T17:40:46.509739"
+    },
+    {
+      "source": "test_text.pdf",
+      "format": "pdf",
+      "total_pages": 125,
+      "chunks_count": 286,
+      "ocr_applied": false,
+      "created_at": "2026-09-12T17:46:00.086022"
     }
   ],
   "evaluation_runs": [

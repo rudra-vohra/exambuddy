@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, FileText, BarChart3 } from 'lucide-react';
+import { BookOpen, FileText, BarChart3, Bot } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, health }) {
   return (
@@ -27,7 +27,7 @@ export default function Navbar({ activeTab, setActiveTab, health }) {
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
             }`}
           >
-            <BookOpen className="w-4 h-4" />
+            <Bot className="w-4 h-4" />
             <span>Study Assistant</span>
           </button>
 
