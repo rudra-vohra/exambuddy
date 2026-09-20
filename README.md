@@ -84,7 +84,7 @@ The ExamBuddy is an academic study assistant designed to support students during
 ## Directory Structure
 
 ```
-itgeeks_rag/
+ExamBuddy/
 |-- backend/
 |   |-- main.py                    # FastAPI entrypoint and lifespan management
 |   |-- config.py                  # Pydantic environment configuration
@@ -167,8 +167,8 @@ itgeeks_rag/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/itgeeks_rag.git
-cd itgeeks_rag
+git clone https://github.com/your-username/exambuddy.git
+cd exambuddy
 ```
 
 ### 2. Configure Environment Variables
