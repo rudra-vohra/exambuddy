@@ -167,7 +167,7 @@ ExamBuddy/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/exambuddy.git
+git clone https://github.com/rudra-vohra/exambuddy.git
 cd exambuddy
 ```
 
