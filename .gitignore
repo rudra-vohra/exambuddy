@@ -41,6 +41,7 @@ mongo_data/
 .DS_Store
 Thumbs.db
 .idea/
+.agent/
 .vscode/*
 !.vscode/extensions.json
 *.suo
