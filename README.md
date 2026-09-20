@@ -120,8 +120,7 @@ itgeeks_rag/
 |   |   |-- package.json           # Frontend dependency manifest
 |   |   `-- vite.config.js         # Vite bundler configuration
 |   `-- index.html                 # HTML entry template
-|-- rag/
-|   `-- docker-compose.yml         # Container configuration for Qdrant and MongoDB
+|-- docker-compose.yml      # Container configuration for Qdrant and MongoDB
 `-- scripts/                       # Automation scripts for indexing and validation
 ```
 
@@ -197,7 +196,7 @@ TOP_K=6
 Launch the Qdrant vector database and MongoDB instances using Docker Compose:
 
 ```bash
-docker compose -f rag/docker-compose.yml up -d
+docker compose up -d
 ```
 
 Verify that both containers are active:
